@@ -392,6 +392,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           if (call.hasArgument("forName")) {
             final String indexName = call.argument("forName");
 
+
             final Database db = database;
             AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
               @Override
@@ -438,12 +439,31 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
 
           if (_concurrencyControl != null && call.hasArgument("map")) {
             Map<String, Object> _document = call.argument("map");
-            try {
-              Map<String,Object> saveResult = mCBManager.saveDocument(database, _document, _concurrencyControl);
-              result.success(saveResult);
-            } catch (CouchbaseLiteException e) {
-              result.error("errSave", "error saving document", e.toString());
-            }
+
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+              @Override
+              public void run() {
+                try {
+                  Map<String,Object> saveResult = mCBManager.saveDocument(database, _document, _concurrencyControl);
+
+
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.success(saveResult);
+                    }
+                  });
+                } catch (final CouchbaseLiteException e) {
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.error("errSave", "error saving document", e.toString());
+                    }
+                  });
+                }
+              }
+            });
+
           } else {
             result.error("errArg", "invalid arguments", null);
           }
@@ -487,29 +507,45 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
             _id = call.argument("id");
 
             Map<String, Object> _map = call.argument("map");
-            try {
-              Map<String,Object> saveResult;
 
-              Long sequence = null;
-              if (call.hasArgument("sequence")) {
-                Object sObj = call.argument("sequence");
 
-                if (sObj instanceof Integer) {
-                  sequence = Long.valueOf((Integer) sObj);
-                } else if (sObj instanceof Long) {
-                  sequence = (Long) sObj;
+              AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+                @Override
+                public void run() {
+                  try {
+                    Map<String,Object> saveResult;
+
+                    Long sequence = null;
+                    if (call.hasArgument("sequence")) {
+                      Object sObj = call.argument("sequence");
+
+                      if (sObj instanceof Integer) {
+                        sequence = Long.valueOf((Integer) sObj);
+                      } else if (sObj instanceof Long) {
+                        sequence = (Long) sObj;
+                      }
+                    }
+                  if (sequence != null) {
+                    saveResult = mCBManager.saveDocumentWithId(database, _id, sequence, _map, _concurrencyControl);
+                  } else {
+                    saveResult = mCBManager.saveDocumentWithId(database, _id, _map, _concurrencyControl);
+                  }
+
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.success(saveResult);
+                    }
+                  });
+                  } catch (CouchbaseLiteException e) {
+                    result.error("errSave", "error saving document with id " + _id, e.toString());
+                  }
                 }
-              }
+              });
 
-              if (sequence != null) {
-                saveResult = mCBManager.saveDocumentWithId(database, _id, sequence, _map, _concurrencyControl);
-              } else {
-                saveResult = mCBManager.saveDocumentWithId(database, _id, _map, _concurrencyControl);
-              }
-              result.success(saveResult);
-            } catch (CouchbaseLiteException e) {
-              result.error("errSave", "error saving document with id " + _id, e.toString());
-            }
+
+
+
           } else {
             result.error("errArg", "invalid arguments", null);
           }
@@ -583,19 +619,53 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
             return;
           }
 
-          result.success(database.getCount());
+          final Database db = database;
+          AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+             final int count = db.getCount();
+
+              new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                  result.success(count);
+                }
+              });
+            }
+          });
           break;
         case ("getIndexes"):
           if (database == null) {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);
             return;
           }
+          final Database db = database;
+          AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+              try {
+               final List<String> indexs = db.getIndexes();
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    result.success(indexs);
+                  }
+                });
+              } catch (CouchbaseLiteException e) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    result.error("errIndexes", "error getting indexes for" + dbname, null);
+                  }
+                });
 
-          try {
-            result.success(database.getIndexes());
-          } catch (CouchbaseLiteException e) {
-            result.error("errIndexes", "error getting indexes for" + dbname, null);
-          }
+              }
+
+
+            }
+          });
+
+
 
           break;
         case ("addChangeListener"):
