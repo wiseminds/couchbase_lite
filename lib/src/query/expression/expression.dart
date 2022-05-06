@@ -16,8 +16,14 @@ abstract class Expression {
   // TODO: Implement date value in Expression
   // static Expression date(DateTime value);
 
+  factory Expression.date(DateTime value) {
+    return VariableExpression(
+        {'date': '${value.year}-${value.month}-${value.day}'});
+  }
+
   factory Expression.intValue(int value) {
-    return VariableExpression({value.bitLength > 32 ? 'longValue' : 'intValue': value});
+    return VariableExpression(
+        {value.bitLength > 32 ? 'longValue' : 'intValue': value});
   }
 
   factory Expression.value(Object value) {
@@ -149,6 +155,7 @@ abstract class Expression {
         selector: expression.internalExpressionStack,
         secondSelector: secondExpression.internalExpressionStack
       });
+      // print("CouchbaseLitePlugin ${clone._internalExpressionStack}");
     } else {
       clone._internalExpressionStack
           .add({selector: expression.internalExpressionStack});

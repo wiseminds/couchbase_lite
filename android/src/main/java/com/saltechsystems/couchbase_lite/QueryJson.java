@@ -1,5 +1,8 @@
 package com.saltechsystems.couchbase_lite;
 
+import android.util.Log;
+
+
 import com.couchbase.lite.ArrayExpression;
 import com.couchbase.lite.ArrayFunction;
 import com.couchbase.lite.DataSource;
@@ -34,7 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
 
+import java.text.ParseException;
 import io.flutter.plugin.common.JSONUtil;
 
 class QueryJson {
@@ -349,7 +355,17 @@ class QueryJson {
                         returnExpression = Expression.booleanValue((boolean) currentExpression.get("booleanValue"));
                         break;
                     case ("date"):
-                        returnExpression = Expression.date((Date) currentExpression.get("date"));
+                  
+                    try {
+                          Date date = (Date)  new SimpleDateFormat("yyyy-MM-dd")
+                    .parse(currentExpression.get("date").toString());
+
+                    Log.d("CouchbaseLitePlugin", date.toString() );
+                        returnExpression = Expression.date(date);
+                    } catch (ParseException e){
+                        Log.d("CouchbaseLitePlugin", e.toString());
+
+                    }
                         break;
                     case ("doubleValue"):
                         returnExpression = Expression.doubleValue((double) currentExpression.get("doubleValue"));
@@ -495,6 +511,9 @@ class QueryJson {
                         List<String> values = getStringList(currentExpression.get("fullTextMatch"));
                         returnExpression = FullTextExpression.index(values.get(0)).match(values.get(1));
                         break;
+                    case ("between"):
+                    Log.d("CouchbaseLitePlugin", currentExpression.get("between").toString());
+                    continue;
 
                 }
             } else {
@@ -570,10 +589,12 @@ class QueryJson {
                         returnExpression = returnExpression.subtract(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("subtract"))));
                         break;
                     case ("between"):
+                    Log.d("CouchbaseLitePlugin", currentExpression.get("between").toString());
                         returnExpression = returnExpression.between(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("between"))),inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("and"))));
                         break;
                     case ("in"):
-                        List<Expression> inExpressions = new ArrayList<>();
+                        List<Expression> inExpressions = new ArrayList<>(); 
+
                         Object objectList = currentExpression.get("in");
                         if (objectList instanceof List<?>) {
                             List<?> genericList = (List<?>) objectList;
