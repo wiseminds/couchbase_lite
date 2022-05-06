@@ -360,7 +360,7 @@ class QueryJson {
                           Date date = (Date)  new SimpleDateFormat("yyyy-MM-dd")
                     .parse(currentExpression.get("date").toString());
 
-                    Log.d("CouchbaseLitePlugin", date.toString() );
+                    // Log.d("CouchbaseLitePlugin", date.toString() );
                         returnExpression = Expression.date(date);
                     } catch (ParseException e){
                         Log.d("CouchbaseLitePlugin", e.toString());
@@ -511,9 +511,7 @@ class QueryJson {
                         List<String> values = getStringList(currentExpression.get("fullTextMatch"));
                         returnExpression = FullTextExpression.index(values.get(0)).match(values.get(1));
                         break;
-                    case ("between"):
-                    Log.d("CouchbaseLitePlugin", currentExpression.get("between").toString());
-                    continue;
+                  
 
                 }
             } else {
@@ -535,6 +533,7 @@ class QueryJson {
                         returnExpression = returnExpression.add(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("add"))));
                         break;
                     case ("and"):
+                    // Log.d("CouchbaseLitePlugin add", currentExpression.get("and").toString());
                         returnExpression = returnExpression.and(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("and"))));
                         break;
                     case ("divide"):
@@ -589,9 +588,20 @@ class QueryJson {
                         returnExpression = returnExpression.subtract(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("subtract"))));
                         break;
                     case ("between"):
-                    Log.d("CouchbaseLitePlugin", currentExpression.get("between").toString());
-                        returnExpression = returnExpression.between(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("between"))),inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("and"))));
-                        break;
+                    // Log.d("CouchbaseLitePlugin between", currentExpression.get("between").toString());
+                    List<Expression> btwExpressions = new ArrayList<>(); 
+
+                    Object obj = currentExpression.get("between");
+                    if (obj instanceof List<?>) {
+                        List<?> genericList = (List<?>) obj;
+                        for (Object list : genericList) {
+                            btwExpressions.add(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(list)));
+                        }
+                    }
+
+                    returnExpression = returnExpression.between(btwExpressions.get(0), btwExpressions.get(1));
+                    break;
+                        
                     case ("in"):
                         List<Expression> inExpressions = new ArrayList<>(); 
 
