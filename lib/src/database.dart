@@ -118,9 +118,9 @@ class Database {
   }
 
   /// Saves documents in batch.
-  /// 
-  /// Returns no. of successfully inserted documents 
-  /// 
+  ///
+  /// Returns no. of successfully inserted documents
+  ///
   /// Note: It's more efficient to call this method to save
   /// documents in batch than calling [saveDocument] on each document.
   Future<int> saveDocuments(List<MutableDocument> docs,
@@ -171,12 +171,12 @@ class Database {
     return true;
   }
 
-  /// Deletes documents in batch 
-  /// 
+  /// Deletes documents in batch
+  ///
   /// [ids] - the ids of the documents to be deleted.
-  /// 
+  ///
   /// Returns no. of successfully deleted documents.
-  /// 
+  ///
   /// Note: it's more efficient to call this method to delete documents than
   /// than calling deletDocument on each document.
   Future<int> deleteDocuments(List<String> ids) async {

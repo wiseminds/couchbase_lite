@@ -12,6 +12,7 @@ class ReplicatorConfiguration {
   String? pinnedServerCertificate;
   Authenticator? authenticator;
   List<String>? channels;
+
   /// Filters which documents should be replicated. Keys are attribute names,
   /// and values are a list of allowed values for that attribute. A document
   /// will only be pushed if it matches all of the filters in this map.
@@ -20,6 +21,7 @@ class ReplicatorConfiguration {
   List<dynamic>? pushAttributeValuesFilter;
   @Deprecated('use pushAttributeFilters instead for multiple filter support')
   String? pushAttributeKeyFilter;
+
   /// Filters which documents should be replicated. Keys are attribute names,
   /// and values are a list of allowed values for that attribute. A document
   /// will only be pulled if it matches all of the filters in this map.
@@ -63,7 +65,8 @@ class ReplicatorConfiguration {
 
     if (pushAttributeKeyFilter != null && pushAttributeValuesFilter != null) {
       pushAttributeFilters ??= {};
-      pushAttributeFilters![pushAttributeKeyFilter!] = pushAttributeValuesFilter!;
+      pushAttributeFilters![pushAttributeKeyFilter!] =
+          pushAttributeValuesFilter!;
     }
 
     if (pushAttributeFilters != null) {
@@ -72,7 +75,8 @@ class ReplicatorConfiguration {
 
     if (pullAttributeKeyFilter != null && pullAttributeValuesFilter != null) {
       pullAttributeFilters ??= {};
-      pullAttributeFilters![pullAttributeKeyFilter!] = pullAttributeValuesFilter!;
+      pullAttributeFilters![pullAttributeKeyFilter!] =
+          pullAttributeValuesFilter!;
     }
 
     if (pullAttributeFilters != null) {

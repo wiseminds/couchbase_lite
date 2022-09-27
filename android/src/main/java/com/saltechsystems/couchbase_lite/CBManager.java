@@ -27,15 +27,15 @@ import java.util.Map;
 import java.util.Objects;
 
 class CBManager {
-    private HashMap<String, Database> mDatabase = new HashMap<>();
-    private HashMap<String, Query> mQueries = new HashMap<>();
+    private final HashMap<String, Database> mDatabase = new HashMap<>();
+    private final HashMap<String, Query> mQueries = new HashMap<>();
     private final static HashMap<String, Blob> mBlobs = new HashMap<>();
-    private HashMap<String, ListenerToken> mQueryListenerTokens = new HashMap<>();
-    private HashMap<String, Replicator> mReplicators = new HashMap<>();
-    private HashMap<String, ListenerToken[]> mReplicatorListenerTokens = new HashMap<>();
-    private HashMap<String, ListenerToken> mDatabaseListenerTokens = new HashMap<>();
-    private DatabaseConfiguration mDBConfig;
-    private CBManagerDelegate mDelegate;
+    private final HashMap<String, ListenerToken> mQueryListenerTokens = new HashMap<>();
+    private final HashMap<String, Replicator> mReplicators = new HashMap<>();
+    private final HashMap<String, ListenerToken[]> mReplicatorListenerTokens = new HashMap<>();
+    private final HashMap<String, ListenerToken> mDatabaseListenerTokens = new HashMap<>();
+    private final DatabaseConfiguration mDBConfig;
+    private final CBManagerDelegate mDelegate;
 
     CBManager(CBManagerDelegate delegate, LogLevel logLevel) {
         mDelegate = delegate;
@@ -70,16 +70,16 @@ class CBManager {
 
     List<Map<String, Object>> saveDocuments(Database database, List<Map<String, Object>> documents,
             ConcurrencyControl concurrencyControl) {
-        final Database db = database;
-        final List<Map<String, Object>> docs = documents;
-        final ConcurrencyControl concurrency = concurrencyControl;
+//        final Database db = database;
+//        final List<Map<String, Object>> docs = documents;
+//        final ConcurrencyControl concurrency = concurrencyControl;
         final List<Map<String, Object>> results = new ArrayList<>();
         
-        try {
-            database.inBatch(new Runnable() {
-                @Override
-                public void run() {
-                    for (Map<String, Object> doc : docs) {
+//        try {
+//            database.inBatch(new Runnable() {
+//                @Override
+//                public void run() {
+                    for (Map<String, Object> doc : documents) {
                         Map<String, Object> result;
 
                         try {
@@ -89,13 +89,13 @@ class CBManager {
                                 doc.remove("_id");
                                 doc.remove("_sequence");
                                 if (_sequence == 0) {
-                                    result = saveDocumentWithId(db, _id, doc, concurrency);
+                                    result = saveDocumentWithId(database, _id, doc, concurrencyControl);
                                 } else {
-                                    result = saveDocumentWithId(db, _id, _sequence, doc, concurrency);
+                                    result = saveDocumentWithId(database, _id, _sequence, doc, concurrencyControl);
                                 }
 
                             } else {
-                                result = saveDocument(db, doc, concurrency);
+                                result = saveDocument(database, doc, concurrencyControl);
                             }
                         } catch (CouchbaseLiteException e) {
                             result = new HashMap<>();
@@ -104,11 +104,11 @@ class CBManager {
 
                         results.add(result);
                     }
-                }
-            });
-        } catch (CouchbaseLiteException e) {
-            return results;
-        }
+//                }
+//            });
+//        } catch (CouchbaseLiteException e) {
+//            return results;
+//        }
 
         return results;
     }
@@ -335,30 +335,30 @@ class CBManager {
     }
 
     List<Boolean> deleteDocumentsWithIds(Database database, List<String> ids) {
-        final Database db = database;
-        final List<String> _ids = ids;
+//        final Database db = database;
+//        final List<String> _ids = ids;
         final List<Boolean> results = new ArrayList<>();
 
-        try {
-            database.inBatch(new Runnable() {
-                @Override
-                public void run() {
-                    for (String id : _ids) {
+//        try {
+//            database.inBatch(new Runnable() {
+//                @Override
+//                public void run() {
+                    for (String id : ids) {
                         boolean success = true;
                         try {
-                            deleteDocumentWithId(db, id);
+                            deleteDocumentWithId(database, id);
                         } catch (CouchbaseLiteException e) {
                             System.out.println("Failed to delete document: " + e.getMessage());
                             success = false;
                         }
                         results.add(success);
                     }
-                }
-            });
-        } catch (CouchbaseLiteException e) {
-            e.printStackTrace();
-            return results;
-        }
+//                }
+//            });
+//        } catch (CouchbaseLiteException e) {
+//            e.printStackTrace();
+//            return results;
+//        }
         return results;
     }
 

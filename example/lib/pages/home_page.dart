@@ -62,7 +62,8 @@ class _HomePageState extends State<HomePage> {
                         return _buildBeerContent(state.beerMap,
                             state.lastIndex + 1, state.hasReachedEnd);
                       case BreweryDataState:
-                        BreweryDataState state = snapshot.data as BreweryDataState;
+                        BreweryDataState state =
+                            snapshot.data as BreweryDataState;
                         return _buildBreweryContent(state.breweryMap,
                             state.lastIndex + 1, state.hasReachedEnd);
                     }

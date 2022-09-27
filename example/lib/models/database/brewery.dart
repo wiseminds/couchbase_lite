@@ -38,7 +38,8 @@ abstract class Brewery implements Built<Brewery, BreweryBuilder> {
   }
 
   Map? toMap() {
-    return standardSerializers.serializeWith(Brewery.serializer, this) as Map<dynamic, dynamic>?;
+    return standardSerializers.serializeWith(Brewery.serializer, this)
+        as Map<dynamic, dynamic>?;
   }
 
   static Brewery? fromJson(String jsonString) {

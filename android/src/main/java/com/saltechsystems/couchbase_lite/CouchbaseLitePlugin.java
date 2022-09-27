@@ -36,6 +36,7 @@ import com.couchbase.lite.FullTextIndexItem;
 import com.couchbase.lite.IndexBuilder;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogLevel;
+import com.couchbase.lite.MaintenanceType;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryChange;
 import com.couchbase.lite.QueryChangeListener;
@@ -338,7 +339,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           }
 
           try {
-            database.compact();
+            database.performMaintenance(MaintenanceType.COMPACT);
             result.success(null);
           } catch (Exception e) {
             result.error("errCompact", "error compacting database with name " + dbname, e.toString());
@@ -797,7 +798,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           result.success(null);
           break;
         case ("resetCheckpoint"):
-          replicator.resetCheckpoint();
+//          replicator.resetCheckpoint();
 
           result.success(null);
           break;
@@ -822,6 +823,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
       switch (call.method) {
         case ("executeQuery"):
           try {
+            assert json != null;
             id = json.getString("queryId");
           } catch (JSONException e) {
             result.error("errArg", "Query Error: Invalid Arguments", e);
@@ -863,6 +865,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           break;
         case ("storeQuery"):
           try {
+            assert json != null;
             id = json.getString("queryId");
           } catch (JSONException e) {
             result.error("errArg", "Query Error: Invalid Arguments", e);
@@ -909,6 +912,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           break;
         case ("removeQuery"):
           try {
+            assert json != null;
             id = json.getString("queryId");
           } catch (JSONException e) {
             result.error("errArg", "Query Error: Invalid Arguments", e);
@@ -921,6 +925,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
 
         case ("explainQuery"):
           try {
+            assert json != null;
             id = json.getString("queryId");
           } catch (JSONException e) {
             result.error("errArg", "Query Error: Invalid Arguments", e);
@@ -964,6 +969,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
 
         case ("storeReplicator"):
           try {
+            assert json != null;
             id = json.getString("replicatorId");
           } catch (JSONException e) {
             result.error("errArg", "Query Error: Invalid Arguments", e);
@@ -1035,7 +1041,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
                   }
 
                   int flags = 0;
-                  for (DocumentFlag flag : document.flags()) {
+                  for (DocumentFlag flag : document.getFlags()) {
                     flags += flag.rawValue();
                   }
 

@@ -9,9 +9,9 @@ import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
 import com.couchbase.lite.Function;
-import com.couchbase.lite.FullTextExpression;
+//import com.couchbase.lite.FullTextExpression;
 import com.couchbase.lite.FullTextFunction;
-import com.couchbase.lite.Function;
+//import com.couchbase.lite.Function;
 import com.couchbase.lite.GroupBy;
 import com.couchbase.lite.Join;
 import com.couchbase.lite.Joins;
@@ -37,16 +37,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Locale;
+//import java.util.Locale;
 import java.text.SimpleDateFormat;
 
 import java.text.ParseException;
 import io.flutter.plugin.common.JSONUtil;
 
 class QueryJson {
-    private QueryMap queryMap;
+    private final QueryMap queryMap;
     private Query query = null;
-    private CBManager mCBManager;
+    private final CBManager mCBManager;
 
     QueryJson(JSONObject json, CBManager manager) {
         this.mCBManager = manager;
@@ -509,7 +509,7 @@ class QueryJson {
                         break;
                     case ("fullTextMatch"):
                         List<String> values = getStringList(currentExpression.get("fullTextMatch"));
-                        returnExpression = FullTextExpression.index(values.get(0)).match(values.get(1));
+                        returnExpression = FullTextFunction.match(values.get(0), values.get(1));
                         break;
                   
 
@@ -555,7 +555,7 @@ class QueryJson {
                         returnExpression = returnExpression.isNot(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("isNot"))));
                         break;
                     case ("isNullOrMissing"):
-                        returnExpression = returnExpression.isNullOrMissing();
+                        returnExpression = returnExpression.isNotValued();
                         break;
                     case ("lessThan"):
                         returnExpression = returnExpression.lessThan(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("lessThan"))));
@@ -576,7 +576,7 @@ class QueryJson {
                         returnExpression = returnExpression.notEqualTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("notEqualTo"))));
                         break;
                     case ("notNullOrMissing"):
-                        returnExpression = returnExpression.notNullOrMissing();
+                        returnExpression = returnExpression.isValued();
                         break;
                     case ("or"):
                         returnExpression = returnExpression.or(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("or"))));
@@ -617,8 +617,9 @@ class QueryJson {
                         break;
                     case ("arrayInAny"):
                     case ("satisfies"):
-                        List arrayInAnyList = QueryMap.getListOfMapFromGenericList(currentExpression.get("arrayInAny"));
-                        List satisfiesList = QueryMap.getListOfMapFromGenericList(currentExpression.get("satisfies"));
+                        List<Map<String, Object>> arrayInAnyList = QueryMap.getListOfMapFromGenericList(currentExpression.get("arrayInAny"));
+                        List<Map<String, Object>> satisfiesList = QueryMap.getListOfMapFromGenericList(currentExpression.get("satisfies"));
+                        assert returnExpression instanceof VariableExpression;
                         returnExpression = ArrayExpression.any((VariableExpression) returnExpression)
                                 .in(inflateExpressionFromArray(arrayInAnyList))
                                 .satisfies(inflateExpressionFromArray(satisfiesList));

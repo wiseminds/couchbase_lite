@@ -26,7 +26,8 @@ class ArrayFunctions with Expression {
   final List<Map<String, dynamic>> _internalExpressionStack = [];
 
   @override
-  List<Map<String, dynamic>> get internalExpressionStack => List.from(_internalExpressionStack);
+  List<Map<String, dynamic>> get internalExpressionStack =>
+      List.from(_internalExpressionStack);
 
   @override
   ArrayFunctions _clone() {

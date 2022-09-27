@@ -31,7 +31,7 @@ abstract class TokenResponse
 
   @BuiltValueField(wireName: 'access_token')
   String? get accessToken;
-  
+
   @BuiltValueField(wireName: 'refresh_token')
   String? get refreshToken;
   @BuiltValueField(wireName: 'token_type')
@@ -46,7 +46,8 @@ abstract class TokenResponse
   }
 
   Map? toMap() {
-    return standardSerializers.serializeWith(TokenResponse.serializer, this) as Map<dynamic, dynamic>?;
+    return standardSerializers.serializeWith(TokenResponse.serializer, this)
+        as Map<dynamic, dynamic>?;
   }
 
   static TokenResponse? fromJson(String jsonString) {

@@ -23,7 +23,9 @@ class Query {
     _options['queryId'] = queryId;
 
     if (!_stored && tokens.isNotEmpty) {
-      _stored = await _channel.invokeMethod<bool>('storeQuery', this).then((bool? value) => value ?? false);
+      _stored = await _channel
+          .invokeMethod<bool>('storeQuery', this)
+          .then((bool? value) => value ?? false);
     }
 
     try {
@@ -98,7 +100,9 @@ class Query {
 
     if (_stored && tokens.isEmpty) {
       // We had to store this before listening to so if stored on the platform
-      _stored = !(await _channel.invokeMethod<bool>('removeQuery', this).then((bool? value) => value ?? false));
+      _stored = !(await _channel
+          .invokeMethod<bool>('removeQuery', this)
+          .then((bool? value) => value ?? false));
     }
   }
 
@@ -117,7 +121,9 @@ class Query {
   Future<String> explain() {
     //Make sure the queryId is available when the toJson() method is called.
     _options['queryId'] = queryId;
-    return _channel.invokeMethod<String>('explainQuery', this).then((String? value) => value ?? '');
+    return _channel
+        .invokeMethod<String>('explainQuery', this)
+        .then((String? value) => value ?? '');
   }
 
   Map<String, dynamic> toJson() => options;

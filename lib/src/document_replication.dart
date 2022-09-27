@@ -16,7 +16,8 @@ abstract class DocumentReplication
   DocumentReplication._();
 
   factory DocumentReplication(
-      [Function(DocumentReplicationBuilder b)? updates]) = _$DocumentReplication;
+          [Function(DocumentReplicationBuilder b)? updates]) =
+      _$DocumentReplication;
 
   @BuiltValueField(serialize: false)
   Replicator? get replicator;

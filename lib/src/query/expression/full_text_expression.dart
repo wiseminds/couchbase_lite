@@ -22,11 +22,11 @@ class FullTextExpression extends Object with Expression {
 
   FullTextExpression._();
 
- FullTextExpression._match(String indexName, String query) {
+  FullTextExpression._match(String indexName, String query) {
     _internalExpressionStack.add({
       'fullTextMatch': [indexName, query],
     });
- }
+  }
 
   FullTextExpression._clone(FullTextExpression expression) {
     _internalExpressionStack.addAll(expression.internalExpressionStack);

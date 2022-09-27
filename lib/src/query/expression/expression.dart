@@ -59,10 +59,9 @@ abstract class Expression {
     return _addExpression('and', expression);
   }
 
-  Expression between(Expression expression1, Expression expression2) { 
+  Expression between(Expression expression1, Expression expression2) {
     return _addList('between', [expression1, expression2]);
   }
-
 
   Expression divide(Expression expression) {
     return _addExpression('divide', expression);

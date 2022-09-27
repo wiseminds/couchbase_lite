@@ -28,7 +28,9 @@ import 'package:couchbase_lite_example/data/api_provider.dart';
 export 'database.dart';
 
 enum Environment { development, production }
+
 enum LoginResult { unauthorized, authorized, disconnected, error }
+
 enum LogoutMethod {
   normal,
   apiCredentialsError,

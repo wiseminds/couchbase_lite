@@ -11,6 +11,7 @@ import com.couchbase.lite.Endpoint;
 import com.couchbase.lite.ReplicationFilter;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorConfiguration;
+import com.couchbase.lite.ReplicatorType;
 import com.couchbase.lite.SessionAuthenticator;
 import com.couchbase.lite.URLEndpoint;
 
@@ -27,8 +28,8 @@ import java.util.Objects;
 import io.flutter.plugin.common.JSONUtil;
 
 class ReplicatorJson {
-    private ReplicatorMap replicatorMap;
-    private CBManager mCBManager;
+    private final ReplicatorMap replicatorMap;
+    private final CBManager mCBManager;
     private ReplicatorConfiguration mReplicatorConfig;
 
     ReplicatorJson(JSONObject json, CBManager manager) {
@@ -63,13 +64,13 @@ class ReplicatorJson {
         if (replicatorMap.hasReplicatorType) {
             switch (replicatorMap.replicatorType) {
                 case "PUSH":
-                    mReplicatorConfig.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH);
+                    mReplicatorConfig.setType(ReplicatorType.PUSH);
                     break;
                 case "PULL":
-                    mReplicatorConfig.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PULL);
+                    mReplicatorConfig.setType(ReplicatorType.PULL);
                     break;
                 case "PUSH_AND_PULL":
-                    mReplicatorConfig.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);
+                    mReplicatorConfig.setType(ReplicatorType.PUSH_AND_PULL);
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid replicator type: " + replicatorMap.replicatorType);
@@ -123,7 +124,7 @@ class ReplicatorJson {
                 String password = (String) replicatorMap.authenticator.get("password");
                 assert username != null;
                 assert password != null;
-                mReplicatorConfig.setAuthenticator(new BasicAuthenticator(username,password));
+                mReplicatorConfig.setAuthenticator(new BasicAuthenticator(username, password.toCharArray()));
                 break;
             case "session":
                 if (!replicatorMap.authenticator.containsKey("sessionId")) throw new IllegalArgumentException("Missing sessionId");
