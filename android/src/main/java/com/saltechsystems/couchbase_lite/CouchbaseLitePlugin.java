@@ -205,13 +205,16 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
 
     @Override
     public void onMethodCall(MethodCall call, @NonNull final Result result) {
+      final String id = call.argument("id");
       switch (call.method) {
+
         case ("setConsoleLogLevel"):
           String level = call.argument("level");
           if (!call.hasArgument("level")) {
             result.error("errArgs", "Error: Missing log level", call.arguments.toString());
             return;
           }
+          assert level != null;
           CBManager.setConsoleLogLevel(LogLevel.valueOf(level.toUpperCase()));
           result.success(null);
           return;
@@ -249,7 +252,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
        database = mCBManager.getDatabase(dbname);
 
 
-      String _id;
+//      String _id;
       final List<String> _ids;
       ConcurrencyControl _concurrencyControl = null;
       if (call.hasArgument("concurrencyControl")) {
@@ -265,14 +268,14 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
 
       switch (call.method) {
         case ("initDatabaseWithName"):
-          final String name = dbname;
+//          final String name = dbname;
           final CBManager manager = mCBManager;
 
           AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
               try {
-                final Database db4 =  manager.initDatabaseWithName(name);
+                final Database db4 =  manager.initDatabaseWithName(dbname);
 
 
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -290,7 +293,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
                   @Override
                   public void run() {
 
-                    result.error("errInit", "error initializing database with name " + name, e.toString());
+                    result.error("errInit", "error initializing database with name " + dbname, e.toString());
 
                   }
                 });
@@ -303,14 +306,14 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);
             return;
           }
-          final String n = dbname;
+//          final String n = dbname;
           final CBManager m = mCBManager;
 
           AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
               try {
-                m.closeDatabaseWithName(n);
+                m.closeDatabaseWithName(dbname);
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                   @Override
                   public void run() {
@@ -323,7 +326,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                   @Override
                   public void run() {
-                    result.error("errClose", "error closing database with name " + n, e.toString());
+                    result.error("errClose", "error closing database with name " + dbname, e.toString());
                   }
                 });
               }
@@ -553,7 +556,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           }
 
           if (call.hasArgument("id") &&  _concurrencyControl != null && call.hasArgument("map")) {
-            _id = call.argument("id");
+//            _id = call.argument("id");
 
             final Map<String, Object> _map = call.argument("map");
             final ConcurrencyControl c = _concurrencyControl;
@@ -571,7 +574,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
               }
             }
             final Long _s  = sequence;
-            final String  id = _id;
+//            final String  id = _id;
             AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
               @Override
               public void run() {
@@ -617,8 +620,23 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
             return;
           }
 
-          _id = call.argument("id");
-          result.success(mCBManager.getDocumentWithId(database, _id));
+
+          AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            final    Map<String,Object> saveResult = mCBManager.getDocumentWithId(database, id);
+
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    result.success(saveResult);
+                  }
+                });
+
+            }
+          });
+
           break;
         case ("deleteDocumentWithId"):
           if (database == null) {
@@ -631,13 +649,30 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
             return;
           }
 
-          _id = call.argument("id");
-          try {
-            mCBManager.deleteDocumentWithId(database, _id);
-            result.success(null);
-          } catch (CouchbaseLiteException e) {
-            result.error("errDelete", "error deleting document", e.toString());
-          }
+
+          AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                mCBManager.deleteDocumentWithId(database, id);
+//                result.success(null);
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    result.success(null);
+                  }
+                });
+              } catch (CouchbaseLiteException e) {
+                result.error("errDelete", "error deleting document", e.toString());
+              }
+
+
+
+
+
+            }
+          });
+
 
           break;
 
@@ -676,6 +711,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           }
 
           final Database mDb = database;
+
           AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
